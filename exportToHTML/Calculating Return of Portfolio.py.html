@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>Calculating Return of Portfolio.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Calculating Return of Portfolio.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">from </span><span class="s1">pandas_datareader </span><span class="s0">import </span><span class="s1">data </span><span class="s0">as </span><span class="s1">wb</span>
+<span class="s0">from </span><span class="s1">openpyxl </span><span class="s0">import </span><span class="s1">Workbook</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+
+<span class="s2">### Geef bij tickers de tickers van alle stock in het portfolio (te vinden op Yahoo Finance)</span>
+<span class="s1">assets = [</span><span class="s3">'ABI.BR'</span><span class="s0">, </span><span class="s3">'VGP.BR'</span><span class="s0">, </span><span class="s3">'KBCA.BR'</span><span class="s1">]</span>
+<span class="s1">mydata = pd.DataFrame()</span>
+<span class="s0">for </span><span class="s1">a </span><span class="s0">in </span><span class="s1">assets:</span>
+    <span class="s1">mydata[a] = wb.DataReader(a</span><span class="s0">, </span><span class="s1">data_source=</span><span class="s3">'yahoo'</span><span class="s0">, </span><span class="s1">start=</span><span class="s3">'2014-4-1'</span><span class="s1">)[</span><span class="s3">'Adj Close'</span><span class="s1">]</span>
+
+<span class="s2"># # mydata.to_excel('/Users/andres/Documents/Beleggen/Stock_Data2.xlsx',sheet_name= 'Stocks')</span>
+<span class="s2"># print(mydata.info())</span>
+<span class="s2"># print(mydata.head())</span>
+<span class="s2"># print(mydata.tail())</span>
+
+<span class="s2"># ## Growth since 2014-4-1</span>
+<span class="s2"># (mydata / mydata.iloc[0] * 100).plot(figsize = (15, 6));</span>
+<span class="s2"># plt.xlabel('Time')</span>
+<span class="s2"># plt.ylabel('Growth (Index 100 = 2014-4-1)')</span>
+<span class="s2"># plt.show()</span>
+<span class="s2"># print('Growth plot printed')</span>
+<span class="s2">#</span>
+<span class="s2"># ### Stock Prices since 2014-4-1</span>
+<span class="s2"># mystocks = pd.DataFrame()</span>
+<span class="s2"># for a in assets:</span>
+<span class="s2">#     mystocks[a] = wb.DataReader(a, data_source='yahoo', start='2014-4-1')['Close']</span>
+<span class="s2"># mystocks.info()</span>
+<span class="s2"># mystocks.head()</span>
+<span class="s2"># mystocks.tail()</span>
+<span class="s2">#</span>
+<span class="s2"># mystocks.plot(figsize=(15, 6))</span>
+<span class="s2"># plt.xlabel('Time')</span>
+<span class="s2"># plt.ylabel('StockPrices')</span>
+<span class="s2"># plt.show()</span>
+<span class="s2"># print('Stock Price Plot printed')</span>
+
+<span class="s2">#### Daily Returns</span>
+<span class="s1">print(</span><span class="s3">&quot;Daily Returns: </span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">)</span>
+
+<span class="s1">print(</span><span class="s3">'Simple Return'</span><span class="s1">)</span>
+<span class="s1">returns = mydata/mydata.shift(</span><span class="s4">1</span><span class="s1">) - </span><span class="s4">1</span>
+<span class="s1">print(returns.tail())</span>
+
+<span class="s1">print(</span><span class="s3">'</span><span class="s0">\n </span><span class="s3">Log Return'</span><span class="s1">)</span>
+<span class="s1">log_returns = np.log(mydata/mydata.shift(</span><span class="s4">1</span><span class="s1">))</span>
+<span class="s1">print(log_returns.tail())</span>
+<span class="s1">print(</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">)</span>
+
+<span class="s2">### Annual Returns</span>
+<span class="s1">print(</span><span class="s3">&quot;Annual Returns: </span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">)</span>
+
+<span class="s1">print(</span><span class="s3">'Simple Annual Return'</span><span class="s1">)</span>
+<span class="s1">annual_returns = returns.mean() * </span><span class="s4">250</span>
+<span class="s1">print(str(annual_returns*</span><span class="s4">100</span><span class="s1">) + </span><span class="s3">'%'</span><span class="s1">)</span>
+
+<span class="s1">print(</span><span class="s3">'</span><span class="s0">\n </span><span class="s3">Log Annual Return'</span><span class="s1">)</span>
+<span class="s1">annual_log_returns = log_returns.mean() * </span><span class="s4">250</span>
+<span class="s1">print(str(annual_log_returns*</span><span class="s4">100</span><span class="s1">) + </span><span class="s3">'%'</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">)</span>
+
+<span class="s2">### Covariance, Correlation &amp; Number of Assets</span>
+<span class="s1">print(</span><span class="s3">&quot;Covariance, Correlation &amp; Number of Assets: </span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s3">'Covariance :</span><span class="s0">\n</span><span class="s3">' </span><span class="s1">+ str(returns.cov() * </span><span class="s4">250</span><span class="s1">) + </span><span class="s3">'</span><span class="s0">\n</span><span class="s3">'</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s3">'Correlation :</span><span class="s0">\n </span><span class="s3">' </span><span class="s1">+ str(returns.corr()) + </span><span class="s3">'</span><span class="s0">\n</span><span class="s3">'</span><span class="s1">)</span>
+<span class="s1">num_assets = len(assets)</span>
+<span class="s1">print(</span><span class="s3">'Number of Assets: ' </span><span class="s1">+ str(num_assets))</span>
+
+<span class="s2"># ## Test Weights</span>
+<span class="s2"># weights = np.random.random(num_assets)</span>
+<span class="s2"># weights /= np.sum(weights)</span>
+<span class="s2"># weights</span>
+<span class="s2"># for w in weights:</span>
+<span class="s2">#     print(w)</span>
+<span class="s2"># print(sum(weights))</span>
+<span class="s2">#</span>
+<span class="s2"># print('\nExpected Portfolio Return: ')</span>
+<span class="s2"># expected_return = np.sum(weights * returns.mean()) * 250</span>
+<span class="s2"># print(expected_return)</span>
+<span class="s2"># print('\nExpected Portfolio Variance: ')</span>
+<span class="s2"># expected_variance = np.dot(weights.T, np.dot(returns.cov() * 250, weights))</span>
+<span class="s2"># print(expected_variance)</span>
+<span class="s2"># print('\nExpected Portfolio Volatility: ')</span>
+<span class="s2"># expected_volatility = np.sqrt(expected_variance)</span>
+<span class="s2"># print(expected_volatility)</span>
+
+<span class="s2">### 1000 weights simmulations (return and volatility)</span>
+<span class="s1">pfolio_returns = []</span>
+<span class="s1">pfolio_volatilities = []</span>
+
+<span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">range (</span><span class="s4">1000</span><span class="s1">):</span>
+    <span class="s1">weights = np.random.random(num_assets)</span>
+    <span class="s1">weights /= np.sum(weights)</span>
+    <span class="s1">pfolio_returns.append(np.sum(weights * returns.mean()) * </span><span class="s4">250</span><span class="s1">)</span>
+    <span class="s1">pfolio_volatilities.append(np.sqrt(np.dot(weights.T</span><span class="s0">,</span><span class="s1">np.dot(returns.cov() * </span><span class="s4">250</span><span class="s0">, </span><span class="s1">weights))))</span>
+
+<span class="s1">pfolio_returns = np.array(pfolio_returns)</span>
+<span class="s1">pfolio_volatilities = np.array(pfolio_volatilities)</span>
+
+<span class="s2">### Dataframe with all resp. returns and volatility</span>
+<span class="s1">print(</span><span class="s3">'</span><span class="s0">\n </span><span class="s3">All portfolios with different weights:'</span><span class="s1">)</span>
+<span class="s1">portfolios = pd.DataFrame({</span><span class="s3">'Return'</span><span class="s1">: pfolio_returns</span><span class="s0">, </span><span class="s3">'Volatility'</span><span class="s1">: pfolio_volatilities})</span>
+<span class="s1">(portfolios.head() </span><span class="s0">,</span><span class="s3">'</span><span class="s0">\n</span><span class="s3">'</span><span class="s0">, </span><span class="s1">portfolios.tail())</span>
+<span class="s1">portfolios.plot(x=</span><span class="s3">'Volatility'</span><span class="s0">, </span><span class="s1">y=</span><span class="s3">'Return'</span><span class="s0">, </span><span class="s1">kind=</span><span class="s3">'scatter'</span><span class="s0">, </span><span class="s1">figsize=(</span><span class="s4">10</span><span class="s0">, </span><span class="s4">6</span><span class="s1">));</span>
+<span class="s1">plt.xlabel(</span><span class="s3">'Expected Volatility'</span><span class="s1">)</span>
+<span class="s1">plt.ylabel(</span><span class="s3">'Expected Return'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s1">print(</span><span class="s3">&quot;Plot printed&quot;</span><span class="s1">)</span>
+</pre>
+</body>
+</html>
