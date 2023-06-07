@@ -88,3 +88,18 @@ def portfolio_return(weights: np.ndarray, performance: Dict[str, np.ndarray]) ->
     returns = np.sum(mean_returns*weights)*252
 
     return returns
+
+
+def portfolio_weighted(weights: np.ndarray, performance: Dict[str, np.ndarray]) -> float:
+    """Calculates a weighted average of the portfolio's mean returns and variance.
+
+    Args:
+        weights (np.ndarray): Array of weights for each asset in the portfolio.
+        performance (Dict[str, np.ndarray]): Dictionary of mean returns and covariance
+    """
+    returns = portfolio_return(weights, performance)
+    volatility = portfolio_volatility(weights, performance)
+    weighted_avg = (-1 * config.VOLATILITY_WEIGHT * returns) + \
+        ((1 - config.VOLATILITY_WEIGHT) * volatility)
+
+    return weighted_avg

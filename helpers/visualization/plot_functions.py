@@ -18,7 +18,8 @@ def plot_individual_asset_performance(performance: Dict[str, pd.DataFrame]) -> N
         performance (Dict[str, pd.DataFrame]): Dictionary of mean returns and covariance matrix.
     """
     annualized_returns = np.asarray(performance['mean_returns']) * 252
-    tickers = [config.TICKER_MAPPING[ticker] for ticker in config.TICKERS]
+    tickers = [config.TICKER_MAPPING.get(
+        ticker, ticker) for ticker in config.TICKERS]
     annualized_stds = np.sqrt(np.diag(performance['cov'])) * np.sqrt(252)
 
     margin = 2.5 * annualized_stds
@@ -40,6 +41,27 @@ def plot_individual_asset_performance(performance: Dict[str, pd.DataFrame]) -> N
     # Adjust the bottom margin
     plt.subplots_adjust(bottom=0.2)
 
+    plt.show()
+
+
+def plot_bar_chart(performance: Dict[str, pd.DataFrame]) -> None:
+    """Plots a bar chart with the actual values on top of the bars.
+
+    Args:
+        performance (Dict[str, pd.DataFrame]): Dictionary of mean returns and covariance matrix.
+    """
+    fig, ax = plt.subplots(figsize=(12, 6))
+    rects = ax.bar(config.TICKERS, np.asarray(performance['mean_returns']) * 252)
+
+    # Add the actual values on top of the bars
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate(f'{height:.2f}', xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 4), textcoords='offset points', ha='center', va='bottom')
+
+    ax.set_title('Individual Asset Performance')
+    ax.set_xlabel('xlabel')
+    ax.set_ylabel('ylabel')
     plt.show()
 
 

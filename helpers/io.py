@@ -32,10 +32,10 @@ def fetch_tickers(ticker_list: list) -> pd.DataFrame:
         # determine earliest date
         last, last_ticker = utils.compare_dates(
             df_ticker.index[0], earliest, ticker)
-        df[config.TICKER_MAPPING[ticker]] = df_ticker
+        df[config.TICKER_MAPPING.get(ticker, ticker)] = df_ticker
     # Remove any rows that contain NaN values
     df.dropna(inplace=True)
-    logging.info(f"Last date was {last} for {config.TICKER_MAPPING[last_ticker]}. "
+    logging.info(f"Last date was {last} for {config.TICKER_MAPPING.get(last_ticker, last_ticker)}. "
                  f"This date will be used as the start for benchmarking and optimization.")
 
     # Return DataFrame

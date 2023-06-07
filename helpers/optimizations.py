@@ -19,16 +19,13 @@ class OptimizationResult:
     method: str
 
 
-def optimize_portfolio(performance: Dict[str, np.ndarray],method: str,
-                       add_constraints: List[Dict[str, Any]] = []) \
+def optimize_portfolio(performance: Dict[str, np.ndarray], method: str) \
         -> OptimizationResult:
     """Optimizes a portfolio given its mean returns and covariance matrix.
 
     Args:
         performance (Dict[str, np.ndarray]): Dictionary of mean returns and covariance matrix.
-        method (str): Optimization method to use ('max_sharpe_ratio' or 'min_variance').
-        add_constraints (List[Dict[str, Union[str, Callable]]]):
-            List of additional constraints to apply to the optimization problem.
+        method (str): Optimization method to use ('max_sharpe_ratio' or 'min_variance')
 
     Returns:
         OptimizationResult: Optimized portfolio weights and objective function value.
@@ -40,8 +37,11 @@ def optimize_portfolio(performance: Dict[str, np.ndarray],method: str,
     bounds = sco.Bounds(np.zeros(num_assets), np.ones(num_assets))
     x0 = num_assets * [1. / num_assets,]
     constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]
-    for add_cstr in add_constraints:
-        constraints.append(add_cstr)
+    if method == "target":
+        constraints.append({
+            'type': 'eq',
+            'fun': lambda x: pc.portfolio_return(x, performance) - config.TARGET_RETURN
+        })
 
     try:
         obj_func = config.OPTIMIZATION_CRITERIA[method]

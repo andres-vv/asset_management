@@ -5,6 +5,10 @@ import logging
 import json
 from typing import Any, Dict, List
 
+import pandas as pd
+import numpy as np
+
+from helpers import portfolio_calculations as pc
 from helpers.optimizations import OptimizationResult
 import config
 
@@ -29,7 +33,7 @@ def compare_dates(date_1: str, date_2: str, ticker: str) -> str:
         return date_2, ticker
 
 
-def format_optimization(outcome: OptimizationResult, tickers: List[str]) \
+def format_optimization(outcome: OptimizationResult, performance: Dict[str, pd.DataFrame]) \
         -> None:
     """Function to format the results of the optimization in
     a more readable format.
@@ -46,18 +50,23 @@ def format_optimization(outcome: OptimizationResult, tickers: List[str]) \
     # round to 4 decimal places
     weights = [round(weight, 4) for weight in weights]
     weight_dict = {}
-    for ticker, weight in zip(tickers, weights):
+    for ticker, weight in zip(config.TICKERS, weights):
         weight_dict[config.TICKER_MAPPING.get(ticker, ticker)] = weight
     # Get the optimized value
     obj_fun = round(outcome.fun, 4)
     # Get the optimization method
     method = outcome.method
 
+    # TODO
+    # recalculate volatility and return of suggested weights
+    returns, std = pc.portfolio_annualised_performance(
+        np.asarray(weights), performance)
     # Format the results
     results = {
         'weights': weight_dict,
-        method: obj_fun
-
+        'portfolio_return': round(returns, 4),
+        'portfolio_volatility': round(std, 4),
+        'optimization_method': method,
     }
     logging.info(
         f"Optimized portfolio weights: {json.dumps(results, indent=4)}")
